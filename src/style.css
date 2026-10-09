@@ -1,107 +1,176 @@
+/* Design tokens. Spacing, radii and type sit on ramps (see docs/DESIGN.md);
+   reach for a token, not a number. */
 :root {
+  /* colour: night navy, warm paper, one star-yellow accent */
+  --page: #060b26;
   --navy: #0c1445;
-  --panel: rgba(18, 30, 92, 0.86);
-  --panel-edge: rgba(255, 255, 255, 0.12);
-  --track: #3550c4;
-  --fill: #f2d35b;
+  --surface: rgba(16, 27, 84, 0.9);
+  --hover-soft: rgba(255, 255, 255, 0.06);
+  --selected: rgba(255, 255, 255, 0.14);
+  --stroke-color: rgba(255, 255, 255, 0.14);
+  --stroke-strong: rgba(255, 255, 255, 0.24);
   --text: #f3f1e8;
-  --text-2: rgba(243, 241, 232, 0.7);
+  --text-2: rgba(243, 241, 232, 0.68);
+  --accent: #f2d35b;
+  --accent-ink: #0c1445;
+  --track: #3550c4;
+
+  /* spacing ramp */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+
+  /* elevation tiers: control 4 / outer 8 / pill */
+  --radius-control: 4px;
+  --radius-outer: 8px;
+  --radius-pill: 999px;
+  --stroke: 1px;
+
+  /* type ramp: roles only, regular + semiBold */
+  --fs-heading2: 18px;
+  --fs-body: 13px;
+  --fs-label: 12px;
+  --regular: 400;
+  --semibold: 600;
   --font: ui-sans-serif, -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  --control-h: 32px;
+  --primary-h: 36px;
+  --panel-w: 320px;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body {
-  background: #060b26;
+  background: var(--page);
   color: var(--text);
-  font: 14px/1.4 var(--font);
+  font: var(--regular) var(--fs-body) / 1.45 var(--font);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
-:focus-visible { outline: 2px solid var(--fill); outline-offset: 2px; }
+button { font: inherit; color: inherit; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+/* ---------- the picture: what leads ---------- */
 .stage {
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
-  padding: 16px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  padding: var(--space-4);
 }
 .stage canvas {
   display: block;
-  border-radius: 6px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-outer);
+  box-shadow: 0 var(--space-4) 48px rgba(0, 0, 0, 0.45);
   touch-action: none;
 }
 
 .status {
   position: absolute;
-  top: 16px;
+  top: var(--space-4);
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--panel);
-  color: var(--text-2);
-  font-size: 13px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-label);
+  white-space: nowrap;
   pointer-events: none;
-  transition: opacity 0.3s;
+  transition: opacity 240ms var(--ease);
 }
 .status:empty { opacity: 0; }
 
 .drop-hint {
   position: absolute;
-  inset: 16px;
+  inset: var(--space-4);
   display: grid;
   place-items: center;
-  border: 2px dashed var(--fill);
-  border-radius: 12px;
-  background: rgba(12, 20, 69, 0.7);
-  font-size: 18px;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-outer);
+  background: rgba(12, 20, 69, 0.72);
+  font-size: var(--fs-heading2);
+  font-weight: var(--semibold);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s;
+  transition: opacity 160ms var(--ease);
 }
 body.dragging .drop-hint { opacity: 1; }
 
-/* ---------- control card ---------- */
+/* ---------- the control card ---------- */
 .panel {
   position: fixed;
-  left: 50%;
-  bottom: calc(20px + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  width: min(380px, calc(100vw - 32px));
-  background: var(--panel);
-  border: 1px solid var(--panel-edge);
-  border-radius: 14px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  z-index: 1;
+  background: var(--surface);
+  border: var(--stroke) solid var(--stroke-color);
+  border-radius: var(--radius-outer);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 var(--space-4) 40px rgba(0, 0, 0, 0.4);
+  transition: opacity 400ms var(--ease);
 }
-.panel-handle {
-  display: none;
-  width: 100%;
-  padding: 10px;
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.panel-head h1 {
+  margin: 0;
+  font-size: var(--fs-heading2);
+  font-weight: var(--semibold);
+  letter-spacing: -0.01em;
+}
+.panel-head p {
+  margin: var(--space-1) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+}
+
+/* Paint · Directions: shows the mode you're in. */
+.switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--hover-soft);
+}
+.switch button {
+  height: calc(var(--control-h) - var(--space-2));
   border: 0;
+  border-radius: var(--radius-pill);
   background: none;
   color: var(--text-2);
-  font: 600 13px var(--font);
+  font-size: var(--fs-label);
+  font-weight: var(--semibold);
   cursor: pointer;
+  transition: background 160ms var(--ease), color 160ms var(--ease);
 }
-.panel-body { padding: 14px 16px 12px; }
+.switch button:hover { color: var(--text); }
+.switch button[aria-pressed="true"] { background: var(--selected); color: var(--text); }
 
+.knobs { display: flex; flex-direction: column; gap: var(--space-3); }
 .knob {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
-  gap: 4px 8px;
-  margin-bottom: 10px;
+  gap: 0 var(--space-2);
 }
-.knob-label { font-weight: 600; font-size: 13px; }
-.knob-value { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--text-2); }
+.knob-label { font-size: var(--fs-body); }
+.knob-value {
+  color: var(--text-2);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
 .knob input { grid-column: 1 / -1; }
 
 input[type="range"] {
@@ -109,82 +178,146 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 22px;
+  height: var(--space-6);
   margin: 0;
   background: transparent;
   cursor: pointer;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 8px;
-  border-radius: 999px;
-  background: linear-gradient(to right, var(--fill) var(--p), var(--track) var(--p));
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(to right, var(--accent) var(--p), var(--track) var(--p));
 }
 input[type="range"]::-moz-range-track {
-  height: 8px;
-  border-radius: 999px;
-  background: linear-gradient(to right, var(--fill) var(--p), var(--track) var(--p));
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(to right, var(--accent) var(--p), var(--track) var(--p));
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 4px;
-  height: 22px;
-  margin-top: -7px;
+  width: var(--space-1);
+  height: 20px;
+  margin-top: -6px;
   border-radius: 2px;
-  background: var(--fill);
+  background: var(--accent);
   box-shadow: 0 0 0 2px var(--navy);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 4px;
-  height: 22px;
+  width: var(--space-1);
+  height: 20px;
   border: 0;
   border-radius: 2px;
-  background: var(--fill);
+  background: var(--accent);
   box-shadow: 0 0 0 2px var(--navy);
 }
 
-.actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  margin-top: 12px;
-}
-.actions button {
-  flex: 1;
-  padding: 8px 6px;
+/* Buttons: one leads, two support, two stay quiet. */
+.btn-primary,
+.btn-secondary,
+.btn-text {
   border: 0;
-  border-radius: 8px;
-  background: none;
-  color: var(--fill);
-  font: 600 13px var(--font);
   cursor: pointer;
   white-space: nowrap;
+  transition: background 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease);
 }
-.actions button:hover { background: rgba(255, 255, 255, 0.07); }
-.actions button:disabled { opacity: 0.45; cursor: default; }
-.actions.secondary { margin-top: 2px; }
-.actions.secondary button { color: var(--text-2); font-weight: 500; }
-.actions button[aria-pressed="true"],
-.actions button.recording { color: var(--fill); background: rgba(242, 211, 91, 0.12); }
+.btn-primary {
+  height: var(--primary-h);
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: var(--semibold);
+}
+.btn-primary:hover { background: #f7de7c; }
+/* Rows sit closer to the button above them than sections sit to each other. */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-top: calc(var(--space-2) - var(--space-4));
+}
+.btn-secondary {
+  height: var(--control-h);
+  border: var(--stroke) solid var(--stroke-strong);
+  border-radius: var(--radius-control);
+  background: none;
+}
+.btn-secondary:hover { background: var(--hover-soft); }
+.btn-secondary:disabled { opacity: 0.4; cursor: default; background: none; }
+.btn-secondary.recording { border-color: var(--accent); color: var(--accent); }
+.row.quiet { margin-top: calc(var(--space-1) - var(--space-4)); }
+.btn-text {
+  height: var(--control-h);
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-2);
+}
+.btn-text:hover { color: var(--text); background: var(--hover-soft); }
 
-/* Phone: picture fills the top, the card tucks away under a handle. */
+.panel-handle {
+  display: none;
+  width: 100%;
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+  font-weight: var(--semibold);
+  cursor: pointer;
+}
+.grip {
+  display: block;
+  width: 36px;
+  height: var(--space-1);
+  margin: 0 auto var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--stroke-strong);
+}
+
+/* ---------- layouts: the card never covers the picture ---------- */
+
+/* Wide screens: the card gets its own column. */
+@media (min-width: 1000px) {
+  .stage { right: calc(var(--panel-w) + var(--space-6)); padding: var(--space-6); }
+  .panel {
+    top: 50%;
+    right: var(--space-6);
+    width: var(--panel-w);
+    max-height: calc(100dvh - 2 * var(--space-6));
+    overflow-y: auto;
+    transform: translateY(-50%);
+  }
+  /* Quiet at rest: dims while you watch, returns on intent. */
+  .panel.resting:not(:hover):not(:focus-within) { opacity: 0.35; }
+}
+
+/* Tablets: a card docked under the picture; the stage's bottom is set from JS. */
+@media (min-width: 641px) and (max-width: 999px) {
+  .panel {
+    left: 50%;
+    bottom: var(--space-4);
+    width: min(420px, calc(100vw - 2 * var(--space-4)));
+    transform: translateX(-50%);
+  }
+  .panel-head { display: none; }
+}
+
+/* Phones: a bottom sheet that tucks away under its handle. */
 @media (max-width: 640px) {
-  /* bottom is set from JS to the card's height, so the picture centres in what's left. */
-  .stage { padding-top: calc(12px + env(safe-area-inset-top)); padding-bottom: 12px; }
+  .stage { padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-3); }
   .panel {
     left: 0;
     right: 0;
     bottom: 0;
-    width: auto;
-    transform: none;
-    border-radius: 16px 16px 0 0;
+    border-width: var(--stroke) 0 0;
+    border-radius: var(--radius-outer) var(--radius-outer) 0 0;
     padding-bottom: env(safe-area-inset-bottom);
   }
   .panel-handle { display: block; }
-  .panel.collapsed .panel-body { display: none; }
+  .panel-head { display: none; }
   .panel-body { padding-top: 0; }
+  .panel.collapsed .panel-body { display: none; }
 }
 
-/* Wide screens: keep the card in the corner so it covers less of the picture. */
-@media (min-width: 1000px) {
-  .panel { left: auto; right: 24px; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
 }

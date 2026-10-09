@@ -82,16 +82,18 @@ describe("particles", () => {
 
   it("stay inside the grid and move one step per tick", () => {
     const p = new Particles(field, 500, rng(7));
+    // Collect violations and assert once: 100k expect() calls are slow enough
+    // to trip the test timeout on a busy machine.
+    const outside: string[] = [], wrongStep: string[] = [];
     for (let t = 0; t < 200; t++) {
       p.step(1.5, 1);
       for (let i = 0; i < p.count; i++) {
-        expect(p.x[i]).toBeGreaterThanOrEqual(0);
-        expect(p.x[i]).toBeLessThanOrEqual(field.w - 1);
-        expect(p.y[i]).toBeGreaterThanOrEqual(0);
-        expect(p.y[i]).toBeLessThanOrEqual(field.h - 1);
-        if (!p.fresh[i]) expect(Math.hypot(p.x[i] - p.px[i], p.y[i] - p.py[i])).toBeCloseTo(1.5, 4);
+        if (p.x[i] < 0 || p.x[i] > field.w - 1 || p.y[i] < 0 || p.y[i] > field.h - 1) outside.push(`${t}:${i}`);
+        if (!p.fresh[i] && Math.abs(Math.hypot(p.x[i] - p.px[i], p.y[i] - p.py[i]) - 1.5) > 1e-4) wrongStep.push(`${t}:${i}`);
       }
     }
+    expect(outside).toEqual([]);
+    expect(wrongStep).toEqual([]);
   });
 
   it("follow the field at full order and keep their heading (no back-and-forth)", () => {

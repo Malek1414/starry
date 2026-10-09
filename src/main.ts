@@ -1,5 +1,5 @@
 import "./style.css";
-import { Engine, type Settings } from "./engine";
+import { Engine, type Mode, type Settings } from "./engine";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -7,7 +7,6 @@ const canvas = $<HTMLCanvasElement>("canvas");
 const status = $("status");
 const panel = $("panel");
 const fileInput = $<HTMLInputElement>("file");
-const modeBtn = $<HTMLButtonElement>("mode");
 const recordBtn = $<HTMLButtonElement>("record");
 
 const DEFAULTS: Settings = { particles: 4000, strokeLength: 2.5, colorSharpness: 0.8, order: 1 };
@@ -67,19 +66,17 @@ for (const k of knobs) {
 
 // ---------- layout ----------
 const isPhone = () => window.matchMedia("(max-width: 640px)").matches;
+const isWide = () => window.matchMedia("(min-width: 1000px)").matches;
+const stage = $("stage");
 function layout(): void {
-  const pad = 16;
-  let height = window.innerHeight - pad * 2;
-  // On a phone the card sits under the picture instead of over it.
-  const stage = $("stage");
-  if (isPhone()) {
-    const cardH = panel.getBoundingClientRect().height;
-    height -= cardH;
-    stage.style.bottom = `${cardH}px`;
-  } else {
-    stage.style.bottom = "";
-  }
-  engine.fit({ width: window.innerWidth - pad * 2, height: Math.max(120, height) });
+  // Below the wide breakpoint the card is docked at the bottom, so the stage
+  // ends where the card begins and the picture is never covered.
+  if (isWide()) stage.style.bottom = "";
+  else stage.style.bottom = `${window.innerHeight - panel.getBoundingClientRect().top}px`;
+  const r = stage.getBoundingClientRect(), cs = getComputedStyle(stage);
+  const width = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const height = r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  engine.fit({ width: Math.max(120, width), height: Math.max(120, height) });
 }
 let resizeTimer = 0;
 window.addEventListener("resize", () => {
@@ -94,8 +91,12 @@ $("panel-toggle").addEventListener("click", (e) => {
 });
 
 // ---------- loading pictures ----------
-function say(msg: string): void {
+let sayTimer = 0;
+/** Show a status line; with `ms`, it clears itself (used for confirmations). */
+function say(msg: string, ms = 0): void {
+  clearTimeout(sayTimer);
   status.textContent = msg;
+  if (ms) sayTimer = window.setTimeout(() => (status.textContent = ""), ms);
 }
 
 async function show(source: Blob | string, label: string): Promise<void> {
@@ -157,25 +158,29 @@ window.addEventListener("paste", (e) => {
 });
 
 // ---------- mode ----------
-modeBtn.addEventListener("click", () => {
-  engine.mode = engine.mode === "paint" ? "directions" : "paint";
-  const on = engine.mode === "directions";
-  modeBtn.setAttribute("aria-pressed", String(on));
-  modeBtn.textContent = on ? "Paint" : "Directions";
-  engine.restart();
-});
+const modeButtons = [...document.querySelectorAll<HTMLButtonElement>("[data-mode]")];
+for (const btn of modeButtons) {
+  btn.addEventListener("click", () => {
+    const mode = btn.dataset.mode as Mode;
+    if (mode === engine.mode) return;
+    engine.mode = mode;
+    for (const b of modeButtons) b.setAttribute("aria-pressed", String(b === btn));
+    engine.restart();
+  });
+}
 
 // ---------- save ----------
 function stamp(): string {
   return new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
 }
 
-async function deliver(blob: Blob, name: string): Promise<void> {
+async function deliver(blob: Blob, name: string, done: string): Promise<void> {
   const file = new File([blob], name, { type: blob.type });
   // Phones: the share sheet lets people save straight to Photos.
   if (isPhone() && navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title: "Starry" });
+      say(done, 1600);
       return;
     } catch (err) {
       if ((err as DOMException).name === "AbortError") return;
@@ -189,11 +194,12 @@ async function deliver(blob: Blob, name: string): Promise<void> {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  say(done, 1600);
 }
 
 $("save").addEventListener("click", () => {
   canvas.toBlob((blob) => {
-    if (blob) void deliver(blob, `starry-${stamp()}.png`);
+    if (blob) void deliver(blob, `starry-${stamp()}.png`, "Saved");
   }, "image/png");
 });
 
@@ -219,7 +225,7 @@ recordBtn.addEventListener("click", () => {
     recordBtn.classList.remove("recording");
     recordBtn.textContent = "Record clip";
     const ext = type.startsWith("video/mp4") ? "mp4" : "webm";
-    void deliver(new Blob(chunks, { type: type.split(";")[0] }), `starry-${stamp()}.${ext}`);
+    void deliver(new Blob(chunks, { type: type.split(";")[0] }), `starry-${stamp()}.${ext}`, "Clip saved");
   };
   // Start from a blank canvas so the clip shows the painting appear.
   engine.restart();
@@ -236,6 +242,19 @@ recordBtn.addEventListener("click", () => {
     }
   }, 1000);
 });
+
+// Quiet at rest: on a mouse/trackpad the card dims after a few idle seconds
+// (CSS keeps it lit while hovered or focused) and wakes on any movement.
+if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  let restTimer = 0;
+  const wake = () => {
+    panel.classList.remove("resting");
+    clearTimeout(restTimer);
+    restTimer = window.setTimeout(() => panel.classList.add("resting"), 3000);
+  };
+  for (const ev of ["pointermove", "pointerdown", "keydown", "wheel"]) window.addEventListener(ev, wake, { passive: true });
+  wake();
+}
 
 // Pause when the tab is hidden so phones don't burn battery in the background.
 document.addEventListener("visibilitychange", () => {

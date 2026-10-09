@@ -22,7 +22,7 @@ Inspired by [@gazisj's Kotlin Starry Night app](https://www.instagram.com/p/DeP2
 | Choose photo | Paint your own picture (or drag and drop / paste one) |
 | Save image | PNG download; on a phone, opens the share sheet so you can save to Photos |
 | Restart | Clear the canvas and paint again from scratch |
-| Directions | Show the direction field alone: white streaks on navy |
+| Paint · Directions | Switch between the painting and the direction field alone (white streaks on navy) |
 | Record clip | A 6-second video of the painting appearing (MP4 or WebM) |
 | Back to Van Gogh | Load *The Starry Night* again |
 
@@ -57,5 +57,8 @@ npm run build    # type-check + production build → dist/
 Every push to `main` is tested, built and deployed to GitHub Pages by
 `.github/workflows/pages.yml`.
 
-The plan this was built from is in [`docs/PLAN.md`](docs/PLAN.md).
+The plan this was built from is in [`docs/PLAN.md`](docs/PLAN.md); the design pass
+(McCODZ Values → Principles → Moves) is in [`docs/DESIGN.md`](docs/DESIGN.md).
+`tests/smoke.browser.js` drives every control in a real browser and is run
+before and after any visual change.
 *The Starry Night* (1889) is in the public domain; the bundled copy is from Wikimedia Commons.
