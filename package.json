@@ -1,0 +1,21 @@
+{
+  "name": "starry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Turn any photo into Van Gogh-style flowing brushwork, in the browser.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.3"
+  }
+}
