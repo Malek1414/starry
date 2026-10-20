@@ -1,0 +1,96 @@
+{
+  "_generator": "https://github.com/Malek1414/Malek1414/blob/main/tools/readme_art.py",
+  "title": "Starry",
+  "tagline": "Turn any photo into Van Gogh-style flowing brushwork.",
+  "chips": [
+    "*flow field",
+    "20,000 brushes",
+    "Canvas 2D",
+    "runs on your device"
+  ],
+  "footer_left": "Malek Hassan · Berlin · 2026",
+  "footer_right": "TypeScript · Vite · Canvas 2D",
+  "alt": "Starry: a pixel star with a face, blinking inside a spinning swirl of blue brushstrokes",
+  "accent": "swirl",
+  "colors": {
+    "star": [
+      "#ffd84a",
+      "#e0a800"
+    ],
+    "shade": [
+      "#e8a317",
+      "#a86b00"
+    ],
+    "swirl": [
+      "#4f7cff",
+      "#1f4fd1"
+    ],
+    "mist": [
+      "#9cc4ff",
+      "#4a86e8"
+    ],
+    "eye": [
+      "#0d1117",
+      "#1f2328"
+    ]
+  },
+  "legend": {
+    "Y": [
+      "star",
+      "star"
+    ],
+    "y": [
+      "shade",
+      "star"
+    ],
+    "M": [
+      "eye",
+      "star"
+    ],
+    "E": [
+      "eye",
+      "eyes"
+    ],
+    "B": [
+      "swirl",
+      "swirl"
+    ],
+    "b": [
+      "mist",
+      "swirl"
+    ]
+  },
+  "motions": {
+    "swirl": "spin",
+    "eyes": "blink"
+  },
+  "origins": {
+    "swirl": "50% 50%"
+  },
+  "sprite": [
+    "............................",
+    ".........BBBBBbbbbb.........",
+    ".......bbbBBBBbbbbbBB.......",
+    "......bbbbBBBBbbbbBBBB......",
+    ".....bbbbbB.......BBBBB.....",
+    "....BBbbb....YY.....BBBb....",
+    "....BBBB....YYYY.....bbbb...",
+    "...BBBBB....YYYY......bbb...",
+    "...BB......YYYYYY......bbb..",
+    ".b.BB.YYYYYYYYYYYYYYYy.bbB..",
+    ".BB....YYYYYYYYYYYYYy...BB..",
+    ".BB.....YYYEYYYYEYYy....BB..",
+    ".BB......YYEYYYYEYy.....BB..",
+    ".BB.......YYYYYYYYy..B..BB..",
+    ".Bbb......YYYMMYYYy..BBB.b..",
+    ".bbb.....YYYYYYYYYYy.BBB....",
+    "..bbb....YYYYYYYYYYy..BB....",
+    "..bbbb..YYYYy..YYYYYy.B.....",
+    "...bBB..YYYy....yYYYy.B.....",
+    "....BB.yyy........yyy.......",
+    ".....B.....bbBBBB...........",
+    "......BBbbbbbBBBBbbb........",
+    "........bbbbbBBBBB..........",
+    "............................"
+  ]
+}
